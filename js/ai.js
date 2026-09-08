@@ -128,6 +128,23 @@ App.AI = (function () {
     }, errCb);
   }
 
+  /* ---- 家校沟通：AI 生成任意文案 ---- */
+  function genFamily(req, ctx, cb, errCb) {
+    var sys = '你是一位经验丰富的初中班主任兼历史教师，擅长家校沟通文案写作。请根据用户需求，用得体、亲切、专业的语气，为家长撰写一段可直接发送到班级群的中文通知文案。要求：\n' +
+      '1. 结构清晰（可用分段/序号），语言口语化但不失体面；\n' +
+      '2. 涉及学生个体信息时一律不出现姓名，用「个别同学」等泛指，遵守未成年人隐私保护；\n' +
+      '3. 结尾落款使用给定班级与教师；\n' +
+      '4. 直接输出文案正文，不要输出任何解释或 JSON。';
+    var ctxLine = '';
+    if (ctx && (ctx.clazz || ctx.teacher)) ctxLine = '\n背景信息：班级=' + (ctx.clazz || '') + '，落款教师=' + (ctx.teacher || '');
+    var user = '需求：' + req + ctxLine;
+    chat([{ role: 'system', content: sys }, { role: 'user', content: user }], function (txt) {
+      var out = (txt || '').replace(/^```[a-z]*\n?/, '').replace(/```\s*$/, '').trim();
+      if (out) cb(out);
+      else { if (errCb) errCb('未能生成文案（请重试）'); else toastErr('未能生成文案，请重试。'); }
+    }, errCb);
+  }
+
   /* ---- 生成结果渲染工具 ---- */
   function renderLesson(obj) {
     var mHtml = (obj.materials || []).map(function (m) {
@@ -176,6 +193,7 @@ App.AI = (function () {
     clearKey: clearKey,
     genLesson: genLesson,
     genExam: genExam,
+    genFamily: genFamily,
     renderLesson: renderLesson,
     renderExam: renderExam
   };

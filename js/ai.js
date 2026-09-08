@@ -1,10 +1,16 @@
 /* ============ AI 增强模块（DeepSeek 前端直连） ============
  * 保持纯静态零后端：浏览器直接 fetch DeepSeek 开放 API。
- * API Key 仅保存在本机浏览器 localStorage，不随作品上传、不外发。
- * 未配置 Key 时，各模块自动回退到内置统编版知识库。
+ * 内置演示 Key（评委打开即用，无需手动配置）+ 前端限流防滥用；
+ * 也可配置自有 Key（仅存本机 localStorage，不上传作品）。
+ * 未配置自有 Key 时自动使用内置演示 Key，调用受限（每日次数/间隔）。
  */
 App.AI = (function () {
   var KEY_STORE = 'sjzs_ai_deepseek_key';
+  var DEMO_KEY = 'sk-960c06a15ae8482fbe11ea88fc2606c3'; // ← 内置演示 Key（评委零配置即用 AI）；评审后请轮换或移除
+  var RATE_DAY = 'sjzs_ai_rate_day';
+  var RATE_LAST = 'sjzs_ai_rate_last';
+  var DAILY_LIMIT = 20; // 每日最多 AI 调用次数（演示防滥用）
+  var MIN_INTERVAL = 8; // 两次调用最小间隔（秒）
 
   /* ---- 轻量页内提示（避免原生 alert 阻断交互） ---- */
   var _toastTimer = null;
@@ -28,16 +34,29 @@ App.AI = (function () {
   var ENDPOINT = 'https://api.deepseek.com/chat/completions';
   var MODEL = 'deepseek-chat';
 
-  function getKey() { try { return localStorage.getItem(KEY_STORE) || ''; } catch (e) { return ''; } }
+  function getKey() { var saved = ''; try { saved = localStorage.getItem(KEY_STORE) || ''; } catch (e) { } return saved || DEMO_KEY; }
   function setKey(k) { try { localStorage.setItem(KEY_STORE, k); } catch (e) { } }
+  function isDemo() { try { return !localStorage.getItem(KEY_STORE) && !!DEMO_KEY; } catch (e) { return !!DEMO_KEY; } }
   function hasKey() { return !!getKey(); }
+  /* ---- 前端限流（防演示 Key 被滥用） ---- */
+  function _dayStr() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function _rateCheck() {
+    var day = _dayStr(), cur = 0;
+    try { var j = JSON.parse(localStorage.getItem(RATE_DAY) || '{}'); if (j.date === day) cur = j.count || 0; } catch (e) { }
+    if (cur >= DAILY_LIMIT) { return { ok: false, msg: '演示 AI 今日调用次数已用尽，可在上方配置自己的 DeepSeek Key 继续使用。' }; }
+    var last = 0; try { last = parseInt(localStorage.getItem(RATE_LAST) || '0', 10) || 0; } catch (e) { }
+    var now = Date.now();
+    if (last && (now - last) < MIN_INTERVAL * 1000) { return { ok: false, msg: '操作太快，请稍候再试（演示限流）。' }; }
+    try { localStorage.setItem(RATE_LAST, String(now)); localStorage.setItem(RATE_DAY, JSON.stringify({ date: day, count: cur + 1 })); } catch (e) { }
+    return { ok: true };
+  }
 
   /* ---- 设置面板 ---- */
   function settingsCard() {
     var on = hasKey();
     return '<div class="card ai-card">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">' +
-      '<span><b>🤖 AI 增强 · 任意课目自由生成</b> <span id="aiStatus" class="tag ' + (on ? 'tag-basic' : 'tag-lite') + '" style="margin-left:6px">' + (on ? '已接入 DeepSeek' : '未配置 Key') + '</span></span>' +
+      '<span><b>🤖 AI 增强 · 任意课目自由生成</b> <span id="aiStatus" class="tag ' + (on ? 'tag-basic' : 'tag-lite') + '" style="margin-left:6px">' + (on ? (isDemo() ? '已接入（内置演示 Key）' : '已接入 DeepSeek') : '未配置 Key') + '</span></span>' +
       '<button class="btn btn-sm btn-outline" onclick="App.AI.toggleSettings(this)">⚙ ' + (on ? '查看 / 更换 Key' : '配置 API Key') + '</button>' +
       '</div>' +
       '<div id="aiSettings" style="display:none;margin-top:12px">' +
@@ -48,7 +67,7 @@ App.AI = (function () {
       '<button class="btn btn-outline" onclick="App.AI.clearKey()">清除</button>' +
       '</div>' +
       '<p class="muted" style="margin-top:8px;line-height:1.7">' +
-      '· 到 <a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 开放平台</a> 注册并申请 API Key（官方提供免费额度）<br>' +
+      '· 当前使用<b>内置演示 Key</b>，评委可即点即用体验 AI 自由生成（受每日调用次数与间隔限制）；如需长期使用，可到 <a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 开放平台</a> 申请自己的 Key 并在此填入<br>' +
       '· 配置后即可在下方自由输入<b>任意课目 / 知识点</b>，由 AI 生成教案或习题；未配置时自动使用内置统编版知识库（已收录课目）<br>' +
       '· Key 由 DeepSeek 计费，请按需使用；AI 生成内容仅供教学参考，请教师人工复核</p>' +
       '</div></div>';
@@ -69,14 +88,16 @@ App.AI = (function () {
   }
   function clearKey() {
     setKey('');
-    var inp = document.getElementById('aiKeyInput'); if (inp) inp.value = '';
+    var inp = document.getElementById('aiKeyInput'); if (inp) inp.value = getKey();
     var st = document.getElementById('aiStatus');
-    if (st) { st.textContent = '未配置 Key'; st.className = 'tag tag-lite'; }
-    toastOk('已清除 API Key，各模块将使用内置知识库。');
+    if (st) { st.textContent = isDemo() ? '已接入（内置演示 Key）' : '未配置 Key'; st.className = isDemo() ? 'tag tag-basic' : 'tag tag-lite'; }
+    toastOk(isDemo() ? '已清除自有 Key，现使用内置演示 Key。' : '已清除 API Key。');
   }
 
   /* ---- 核心：调用 DeepSeek ---- */
   function chat(messages, onOk, onErr) {
+    var rc = _rateCheck();
+    if (!rc.ok) { if (onErr) onErr(new Error(rc.msg)); else toastErr(rc.msg); return; }
     fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getKey() },
@@ -187,6 +208,7 @@ App.AI = (function () {
     toastOk: toastOk,
     toastErr: toastErr,
     hasKey: hasKey,
+    isDemo: isDemo,
     settingsCard: settingsCard,
     toggleSettings: toggleSettings,
     saveKey: saveKey,

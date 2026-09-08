@@ -7,33 +7,34 @@ App.pages.home = {
       '<section class="hero fade-in">' +
       '  <h1>史鉴<span>智师</span></h1>' +
       '  <div class="slogan">以史为鉴 · 以智为师</div>' +
-      '  <p class="muted" style="max-width:640px;margin:0 auto">面向统编版初中历史教材的学科教学智能体<br>知识库 · 工作流 · 插件三重驱动，覆盖备课、命题、批改、学情、答疑、规划全流程</p>' +
+      '  <p class="muted" style="max-width:680px;margin:0 auto">面向统编版初中历史教材的学科教学智能体<br>知识库 · 工作流 · 插件 + AI 大模型驱动，专注智能备课、习题生成、家校沟通三大教学辅助场景</p>' +
       '</section>' +
       '<div class="role-cards fade-in">' +
-      '  <div class="card role-card" onclick="App.go(\'prep\')"><div class="ic">📜</div><h4>教师 · 教学辅助</h4><p>智能备课 / 习题生成 / 作业批改 / 学情分析<br>点击进入 WF1 智能备课工作流</p></div>' +
-      '  <div class="card role-card" onclick="App.go(\'tutor\')"><div class="ic">🏮</div><h4>学生 · 个性化学习</h4><p>启发式答疑 / 错题归因 / 复习规划<br>点击体验"不代写"的苏格拉底式辅导</p></div>' +
-      '  <div class="card role-card" onclick="App.go(\'family\')"><div class="ic">✉️</div><h4>协同 · 班级与家校</h4><p>班级学情报告 / 家校沟通文案 / 活动方案<br>点击生成家长版学情通报</p></div>' +
+      '  <div class="card role-card" onclick="App.go(\'prep\')"><div class="ic">📜</div><h4>智能备课</h4><p>内置 9 课知识库 + AI 任意课目生成<br>点击进入 WF1 智能备课工作流</p></div>' +
+      '  <div class="card role-card" onclick="App.go(\'exam\')"><div class="ic">📝</div><h4>习题生成</h4><p>三维组卷 + AI 任意课目组卷<br>点击进入习题生成</p></div>' +
+      '  <div class="card role-card" onclick="App.go(\'family\')"><div class="ic">✉️</div><h4>家校沟通</h4><p>三大模板 + AI 任意文案生成<br>点击生成家长版学情通报</p></div>' +
       '</div>' +
-      '<div class="card fade-in"><h3>九大功能矩阵</h3>' +
+      '<div class="card fade-in"><h3>三大教学辅助模块</h3>' +
       '  <div class="grid grid-3">' +
-      '    <div><p><b>智能备课</b>（WF1 工作流）</p><p class="muted">课标锚定 · 学情预读 · 分层作业，一键生成教案并导出 Word</p></div>' +
-      '    <div><p><b>习题生成</b></p><p class="muted">知识点 × 难度 × 题型三维组卷，每题附判分点与错因标签</p></div>' +
-      '    <div><p><b>作业批改</b>（WF2 工作流）</p><p class="muted">OCR 识别 → 判分点对齐逐题批改 → 个性化评语与错因归类</p></div>' +
-      '    <div><p><b>学情分析</b></p><p class="muted">知识点热力图 + 素养雷达图 + 共性错因分布与教学建议</p></div>' +
-      '    <div><p><b>启发式答疑</b></p><p class="muted">引导追问 → 思路支架 → 变式练习，答案锁定至提交后解锁</p></div>' +
-      '    <div><p><b>错题本</b></p><p class="muted">四类错因自动归档，一键生成补强练习</p></div>' +
-      '    <div><p><b>复习规划</b>（WF4）</p><p class="muted">按薄弱维度生成周计划与三轮复习路径</p></div>' +
-      '    <div><p><b>历史时间轴</b>（插件）</p><p class="muted">朝代轴与近代大事轴交互梳理，直击时序错乱痛点</p></div>' +
-      '    <div><p><b>家校沟通</b>（插件）</p><p class="muted">三大场景文案模板，学情数据通俗化转写</p></div>' +
+      '    <div><p><b>智能备课</b>（WF1 工作流）</p><p class="muted">课标锚定 · 素养目标 · 史料情境 · 分层作业；可接入 DeepSeek 对任意课目生成教案并导出 Word</p></div>' +
+      '    <div><p><b>习题生成</b></p><p class="muted">知识点 × 难度 × 题型三维组卷，每题附判分点与错因标签；可接入 DeepSeek 对任意课目 / 知识点 AI 组卷</p></div>' +
+      '    <div><p><b>家校沟通</b>（插件）</p><p class="muted">三大场景文案模板；可接入 DeepSeek 按需求生成任意家校沟通文案，自动脱敏</p></div>' +
+      '  </div>' +
+      '</div>' +
+      '<div class="card fade-in"><h3>AI 增强 · 任意场景自由生成</h3>' +
+      '  <div class="grid grid-3">' +
+      '    <div><p><b>任意课目备课</b></p><p class="muted">输入任意课目 / 知识点，DeepSeek 按课标定位—素养目标—史料—问题链—分层作业生成完整教案</p></div>' +
+      '    <div><p><b>任意课目组卷</b></p><p class="muted">输入任意课目 / 知识点，AI 按基础 / 提升 / 拓展三层命制带答案与解析的分层习题</p></div>' +
+      '    <div><p><b>任意文案生成</b></p><p class="muted">输入家校沟通需求，AI 生成规范、得体、脱敏的家长文案，可复制到班级群</p></div>' +
       '  </div>' +
       '</div>' +
       '<div class="arch-strip fade-in">' +
-      '  <span><b>用户层</b> 教师 · 学生 · 家长</span><span class="sep">｜</span>' +
-      '  <span><b>工作流引擎</b> 备课 / 批改 / 辅导 / 规划</span><span class="sep">｜</span>' +
-      '  <span><b>知识库</b> 教材 · 课标 · 史料 · 题库 · 学情档案（RAG）</span><span class="sep">｜</span>' +
-      '  <span><b>插件</b> OCR · 时间轴 · 文档生成 · 消息推送</span>' +
+      '  <span><b>用户层</b> 教师 · 家长</span><span class="sep">｜</span>' +
+      '  <span><b>核心能力</b> 备课 · 组卷 · 家校文案</span><span class="sep">｜</span>' +
+      '  <span><b>知识库</b> 教材 · 课标 · 史料 · 题库</span><span class="sep">｜</span>' +
+      '  <span><b>AI 增强</b> DeepSeek 前端直连（可选）</span>' +
       '</div>' +
-      '<p class="muted fade-in" style="text-align:center;margin-top:18px">安全护栏：史实三重校验 · 启发式不代写 · 学生数据脱敏 · 低置信度内容转教师复核</p>';
+      '<p class="muted fade-in" style="text-align:center;margin-top:18px">安全护栏：史实出处可溯 · 家校文案自动脱敏 · AI 内容仅供教学参考</p>';
   }
 };
 
@@ -228,7 +229,7 @@ App.pages.exam = {
     html += '</div>';
     if (list.length) {
       html += '<div class="card no-print" style="text-align:center"><button class="btn btn-green" onclick="App.pages.exam.exportDoc()">导出本套习题（Word）</button> ' +
-        '<button class="btn btn-outline" onclick="App.go(\'grading\')">去批改配套作业 →</button></div>';
+        '<button class="btn btn-outline" onclick="App.go(\'prep\')">配套课目去备课 →</button></div>';
     }
     document.getElementById('exResult').innerHTML = html;
   },
@@ -282,156 +283,3 @@ App.pages.exam = {
   }
 };
 
-/* ---------------- WF2 作业批改 ---------------- */
-App.pages.grading = {
-  render: function (main) {
-    var t = KB.gradingTask;
-    var rub = t.rubric.map(function (r) { return '<li>' + r.text + '</li>'; }).join('');
-    main.innerHTML =
-      App.pageHead('作业批改 · WF2 工作流', 'OCR 识图插件 → 判分点对齐逐题批改 → 个性化评语与错因归类 → 低置信度内容转教师复核', '教师端') +
-      App.card('第 1 步 · 作业任务（已录入评分细则）',
-        '<p class="kv"><b>任务：</b>' + t.title + '　<b>满分：</b>' + t.fullScore + ' 分　' + App.knowledgeTag(t.lesson) + '</p>' +
-        '<div class="paper-sheet" style="margin:10px 0">' + t.question + '</div>' +
-        '<details><summary style="cursor:pointer;font-family:var(--sans);font-size:13px;color:var(--green)">展开教师评分细则（' + t.rubric.length + ' 个判分点）</summary><ul style="padding-left:20px;margin-top:8px">' + rub + '</ul></details>') +
-      App.card('第 2 步 · 选择学生作业（模拟拍照上传）',
-        '<p class="muted">演示模式：点击学生即模拟"拍照上传 → OCR 识别"。实际环境中此步骤调用 OCR 识图插件完成手写体转写。</p><br>' +
-        t.samples.map(function (sm, i) {
-          return '<button class="btn ' + (i === 1 ? '' : 'btn-outline') + ' btn-sm" style="margin:3px" onclick="App.pages.grading.grade(' + i + ')">📷 ' + sm.student + '（' + sm.level + '）</button>';
-        }).join('') +
-        ' <button class="btn btn-green btn-sm" style="margin:3px" onclick="App.pages.grading.gradeAll()">一键批改全班（3 份）</button>') +
-      App.flowSteps('gradeFlow', ['拍照上传', 'OCR 识别', '结构化解析', '逐题批改', '错因归类', '生成报告']) +
-      App.thinking('gradeThink', '') +
-      '<div id="gradeResult"></div>';
-  },
-  grade: function (i) {
-    App.markSteps('gradeFlow', 0);
-    var t = KB.gradingTask;
-    var sm = t.samples[i];
-    document.getElementById('gradeResult').innerHTML = '';
-    var steps = ['正在调用 OCR 识图插件…', '手写体转写完成，题号对齐…', '对照评分细则逐项判分…', '生成个性化评语并归错因…'];
-    App.showThinking('gradeThink', 2200, steps, function () {
-      App.markSteps('gradeFlow', 6);
-      document.getElementById('gradeResult').innerHTML = App.pages.grading.resultHtml(sm);
-    });
-  },
-  gradeAll: function () {
-    App.markSteps('gradeFlow', 0);
-    var t = KB.gradingTask;
-    var steps = ['批量调用 OCR 识图插件（3 份）…', '手写体转写完成…', '逐份对照评分细则判分…', '汇总班级错因分布…'];
-    App.showThinking('gradeThink', 2400, steps, function () {
-      App.markSteps('gradeFlow', 6);
-      var html = t.samples.map(function (sm) { return App.pages.grading.resultHtml(sm); }).join('');
-      html += '<div class="card no-print" style="text-align:center"><button class="btn btn-green" onclick="App.go(\'analytics\')">汇总学情分析 →</button></div>';
-      document.getElementById('gradeResult').innerHTML = html;
-    });
-  },
-  resultHtml: function (sm) {
-    var t = KB.gradingTask;
-    var hitMap = {};
-    (sm.hits || []).forEach(function (h) { hitMap[h] = 'ok'; });
-    if (sm.partial) hitMap[sm.partial] = 'half';
-    var rub = t.rubric.map(function (r) {
-      var st = hitMap[r.id];
-      var mark = st === 'ok' ? '✓ 得分' : (st === 'half' ? '△ 部分得分' : '✗ 未得分');
-      var cls = st === 'ok' ? 'ok' : (st === 'half' ? '' : 'bad');
-      return '<div class="verdict ' + cls + '">' + mark + ' ｜ ' + r.text + '</div>';
-    }).join('');
-    var wrongHtml = sm.wrongType
-      ? '<p><span class="tag tag-adv">错因归类：' + sm.wrongType + '</span></p><p class="muted" style="margin:6px 0">' + sm.wrongDetail + '</p>'
-      : '<p><span class="tag tag-basic">错因归类：无共性错误</span></p>';
-    return App.card('批改结果 · ' + sm.student + '（' + sm.level + '）',
-      '<span class="ocr-note">OCR 识图插件 · 手写体识别完成（置信度 ' + (sm.wrongType ? '92%' : '98%') + '）</span>' +
-      '<div class="paper-sheet" style="font-size:14.5px;margin-bottom:12px">' + sm.ocr.replace(/\n/g, '<br>') + '</div>' +
-      '<div style="margin:10px 0"><span class="score-pill">' + sm.score + ' / ' + t.fullScore + ' 分</span></div>' +
-      '<div class="section-title" style="font-size:16px">判分点对齐</div>' + rub +
-      wrongHtml +
-      '<div class="section-title" style="font-size:16px">个性化评语</div>' +
-      '<div class="verdict ok" style="font-family:var(--kai);font-size:15px">' + sm.comment + '</div>' +
-      (sm.wrongType ? '<p class="muted no-print">✓ 已将该错因写入 ' + sm.student + ' 的个人学情档案，并在错题本生成补强任务</p>' : ''));
-  }
-};
-
-/* ---------------- 学情分析 ---------------- */
-App.pages.analytics = {
-  render: function (main) {
-    var a = KB.analytics;
-    /* 热力图 */
-    var heat = '<table class="tb" style="table-layout:fixed"><tr><th style="width:64px">学生</th>';
-    a.dims.forEach(function (d) { heat += '<th style="padding:4px 2px;font-size:11px;text-align:center">' + d + '</th>'; });
-    heat += '</tr>';
-    a.scores.forEach(function (row, i) {
-      heat += '<tr><td style="font-size:12px">' + a.students[i] + '</td>';
-      row.forEach(function (v) {
-        var c = v >= 80 ? '#2F6E5E' : (v >= 70 ? '#7FA663' : (v >= 60 ? '#D9A441' : '#C05B4D'));
-        heat += '<td class="heat-cell" style="background:' + c + ';color:#fff;text-align:center;font-size:11px;padding:6px 2px" title="' + a.students[i] + ' · ' + v + '">' + v + '</td>';
-      });
-      heat += '</tr>';
-    });
-    heat += '</table><div class="legend"><span><i style="background:#2F6E5E"></i>掌握良好(≥80)</span><span><i style="background:#7FA663"></i>基本掌握(70-79)</span><span><i style="background:#D9A441"></i>待巩固(60-69)</span><span><i style="background:#C05B4D"></i>薄弱(<60)</span></div>';
-
-    /* 雷达图 SVG */
-    var cx = 150, cy = 145, R = 105;
-    var maxV = 100;
-    var pts = a.literacies.map(function (name, i) {
-      var ang = -Math.PI / 2 + i * 2 * Math.PI / a.literacies.length;
-      var r = R * a.literAvg[i] / maxV;
-      return { x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang), ang: ang };
-    });
-    var poly = pts.map(function (p) { return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
-    var radar = '<svg viewBox="0 0 300 290" style="max-width:300px;margin:0 auto;display:block">';
-    [0.25, 0.5, 0.75, 1].forEach(function (k) {
-      var ring = a.literacies.map(function (n, i) {
-        var ang = -Math.PI / 2 + i * 2 * Math.PI / a.literacies.length;
-        return (cx + R * k * Math.cos(ang)).toFixed(1) + ',' + (cy + R * k * Math.sin(ang)).toFixed(1);
-      }).join(' ');
-      radar += '<polygon points="' + ring + '" fill="none" stroke="#E3D8C4" stroke-width="1"/>';
-    });
-    a.literacies.forEach(function (n, i) {
-      var ang = -Math.PI / 2 + i * 2 * Math.PI / a.literacies.length;
-      var lx = cx + (R + 26) * Math.cos(ang), ly = cy + (R + 26) * Math.sin(ang);
-      radar += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + R * Math.cos(ang)).toFixed(1) + '" y2="' + (cy + R * Math.sin(ang)).toFixed(1) + '" stroke="#E3D8C4"/>';
-      radar += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1) + '" text-anchor="middle" font-size="12" fill="#5E2F1B" font-family="KaiTi">' + n + '</text>';
-      var vx = cx + (R * a.literAvg[i] / maxV + 16) * Math.cos(ang), vy = cy + (R * a.literAvg[i] / maxV + 16) * Math.sin(ang);
-      radar += '<text x="' + vx.toFixed(1) + '" y="' + (vy + 4).toFixed(1) + '" text-anchor="middle" font-size="10.5" fill="#2F6E5E" font-weight="bold">' + a.literAvg[i] + '</text>';
-    });
-    radar += '<polygon points="' + poly + '" fill="rgba(140,74,47,.25)" stroke="#8C4A2F" stroke-width="2"/>';
-    pts.forEach(function (p) { radar += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3.5" fill="#8C4A2F"/>'; });
-    radar += '</svg><p class="muted" style="text-align:center">班级素养均值（满分 100）· 最薄弱：史料实证</p>';
-
-    /* 错因分布条形 */
-    var maxC = Math.max.apply(null, a.wrongDist.map(function (w) { return w.count; }));
-    var bars = a.wrongDist.map(function (w) {
-      return '<div style="display:flex;align-items:center;gap:10px;margin:8px 0;font-family:var(--sans);font-size:13px">' +
-        '<span style="width:80px;text-align:right">' + w.type + '</span>' +
-        '<div style="flex:1;background:#F1EADC;border-radius:5px;overflow:hidden"><div style="width:' + (w.count / maxC * 100) + '%;background:' + w.color + ';height:20px;border-radius:5px;transition:width .8s"></div></div>' +
-        '<b style="width:26px">' + w.count + '</b></div>' +
-        '<div class="muted" style="margin-left:90px;font-size:12px">' + w.cases + '</div>';
-    }).join('');
-
-    main.innerHTML =
-      App.pageHead('学情分析 · ' + a.clazz, '数据来源：WF2 批改结果自动回流 · 个体明细仅任课教师可见（家长端仅呈现汇总数据）', '教师端') +
-      App.card('知识点掌握热力图（10 名学生 × 8 个维度）', heat) +
-      '<div class="grid grid-2">' +
-      App.card('五大核心素养 · 班级雷达', radar) +
-      App.card('共性错因分布（46 处失分点归因）', bars) +
-      '</div>' +
-      App.card('教学调整建议（自动生成）', '<ol style="padding-left:22px">' + a.advice.map(function (ad) { return '<li style="margin:6px 0">' + ad + '</li>'; }).join('') + '</ol>' +
-        '<div class="muted">近期高频薄弱知识点：' + a.recentWeak.map(function (w) { return '<span class="tag tag-adv">' + w + '</span>'; }).join('') + '</div>') +
-      '<div class="card no-print" style="text-align:center">' +
-      '<button class="btn btn-green" onclick="App.pages.analytics.exportDoc()">导出班级学情报告（Word）</button> ' +
-      '<button class="btn btn-outline" onclick="App.go(\'family\')">生成家长版通报 →</button> ' +
-      '<button class="btn btn-outline" onclick="App.go(\'mistakes\')">查看错题本 →</button></div>';
-  },
-  exportDoc: function () {
-    var a = KB.analytics;
-    var rows = a.scores.map(function (row, i) {
-      return '<tr><td>' + a.students[i] + '</td>' + row.map(function (v) { return '<td>' + v + '</td>'; }).join('') + '</tr>';
-    }).join('');
-    var html =
-      '<h2>一、知识点掌握表</h2><table><tr><th>学生</th>' + a.dims.map(function (d) { return '<th>' + d + '</th>'; }).join('') + '</tr>' + rows + '</table>' +
-      '<h2>二、素养均值</h2><p>' + a.literacies.map(function (n, i) { return n + '：' + a.literAvg[i] + ' 分'; }).join('；') + '</p>' +
-      '<h2>三、共性错因分布</h2>' + a.wrongDist.map(function (w) { return '<p>' + w.type + '（' + w.count + ' 处）：' + w.cases + '</p>'; }).join('') +
-      '<h2>四、教学调整建议</h2><ol>' + a.advice.map(function (ad) { return '<li>' + ad + '</li>'; }).join('') + '</ol>';
-    App.exportWord(a.clazz + '-历史学情报告', a.clazz + ' 历史学科阶段性学情报告', html);
-  }
-};

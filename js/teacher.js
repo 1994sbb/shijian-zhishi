@@ -44,14 +44,24 @@ App.pages.prep = {
       return '<option value="' + l.id + '">' + l.book + ' · ' + l.name + '</option>';
     }).join('');
     main.innerHTML =
-      App.pageHead('智能备课 · WF1 工作流', '知识库检索：课标定位 → 学情预读 → 教案生成 → 史料匹配 → 分层作业，全程可追溯出处', '教师端') +
-      App.card('第 1 步 · 选择课目',
+      App.pageHead('智能备课 · WF1 工作流', '内置知识库 + AI 增强：课标定位 → 学情预读 → 教案生成 → 史料匹配 → 分层作业', '教师端') +
+      App.AI.settingsCard() +
+      App.card('第 1 步 · 选择课目（内置知识库 · 9 课）',
         '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
         '<div style="flex:1;min-width:260px"><label class="fld">课目（统编版知识库 · 9 课已收录）</label><select id="prepLesson" style="width:100%">' + opts + '</select></div>' +
         '<button class="btn" onclick="App.pages.prep.run()">启动工作流</button>' +
         '<button class="btn btn-outline" onclick="App.pages.prep.reset()">重置</button>' +
         '</div>' +
         '<div class="muted" style="margin-top:10px">知识库命中演示：选择课目后，智能体将同时召回 ①课标条目 ②该班学情薄弱点 ③匹配史料 ④分层作业模板</div>'
+      ) +
+      App.card('第 2 步 · AI 自由课目（任意教材/知识点）',
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
+        '<div style="flex:1;min-width:260px"><label class="fld">输入任意课目或知识点</label><input id="prepAiTopic" placeholder="如：春秋战国时期的社会变革 / 汉武帝巩固大一统 / 两次鸦片战争 / 洋务运动…" style="width:100%"></div>' +
+        '<button class="btn btn-green" onclick="App.pages.prep.aiRun()">🤖 AI 生成教案</button>' +
+        '</div>' +
+        (App.AI.hasKey()
+          ? '<div class="muted" style="margin-top:10px">已接入 DeepSeek：将调用大模型生成完整教案（约 30 秒）。</div>'
+          : '<div class="muted" style="margin-top:10px"><b>未配置 API Key：</b>请在顶部「AI 增强」中填入 DeepSeek Key，或直接使用上方内置知识库课目。当前 AI 生成为演示引导。</div>')
       ) +
       App.flowSteps('prepFlow', ['任务解析', '课标定位', '学情预读', '教案生成', '史料匹配', '作业编排']) +
       App.thinking('prepThink', '') +
@@ -61,6 +71,46 @@ App.pages.prep = {
   reset: function () {
     App.markSteps('prepFlow', -1);
     document.getElementById('prepResult').innerHTML = '';
+  },
+  aiRun: function () {
+    var topic = (document.getElementById('prepAiTopic').value || '').trim();
+    if (!topic) { App.AI.toastErr('请先输入课目或知识点。'); return; }
+    if (!App.AI.hasKey()) {
+      App.AI.toastErr('尚未配置 DeepSeek API Key，请先在「AI 增强」中填入 Key，或改用上方内置课目。');
+      return;
+    }
+    App.markSteps('prepFlow', 0);
+    App.showThinking('prepThink', 800, [
+      '已接收课目「' + topic + '」…',
+      '调用 DeepSeek 生成教案框架（课标定位·素养目标）…',
+      'AI 检索史料并标注出处…',
+      '组织问题链与分层作业…',
+      '正在整理输出…'
+    ], function () { });
+    var res = document.getElementById('prepResult');
+    res.innerHTML = '<div class="card"><p class="muted">⏳ AI 正在生成《' + topic + '》教案，通常需 20–40 秒，请耐心等待…</p></div>';
+    App.AI.genLesson(topic, function (obj) {
+      App.markSteps('prepFlow', 6);
+      res.innerHTML = App.AI.renderLesson(obj) +
+        '<div class="card no-print" style="text-align:center">' +
+        '<button class="btn btn-outline" onclick="window.print()">打印 / 存为 PDF</button> ' +
+        '<button class="btn btn-outline" onclick="App.pages.prep.aiExport(obj)">导出 Word 教案</button>' +
+        '</div>';
+      document.getElementById('prepAiTopic').value = '';
+    }, function (e) {
+      res.innerHTML = '<div class="card"><p class="muted">AI 生成失败：' + e.message + '，请重试。</p></div>';
+    });
+  },
+  aiExport: function (obj) {
+    var html =
+      '<h2>一、基本信息</h2><p>课目：《' + obj.name + '》' + (obj.book ? '｜' + obj.book : '') + (obj.unit ? '｜' + obj.unit : '') + '<br>课标依据：' + (obj.curriculum || '—') + '</p>' +
+      '<h2>二、教学目标</h2><ol>' + (obj.goals || []).map(function (g) { return '<li>' + g + '</li>'; }).join('') + '</ol>' +
+      '<h2>三、重难点</h2><p>' + (obj.focus || '—') + '</p>' +
+      '<h2>四、史料情境</h2>' + (obj.materials || []).map(function (m) { return '<p>「' + m.text + '」——' + (m.src || '待核验') + '（' + (m.level || '') + '）</p>'; }).join('') +
+      '<h2>五、问题链设计</h2><ol>' + (obj.questionChain || []).map(function (q) { return '<li>' + q + '</li>'; }).join('') + '</ol>' +
+      '<h2>六、分层作业</h2><p><b>基础：</b>' + (obj.homework ? obj.homework.basic : '—') + '<br><b>提升：</b>' + (obj.homework ? obj.homework.mid : '—') + '<br><b>拓展：</b>' + (obj.homework ? obj.homework.adv : '—') + '</p>' +
+      '<p style="color:#999">本教案由 AI 生成，仅供参考，请依据教材与课标人工复核。</p>';
+    App.exportWord(obj.name + '-AI教案', '《' + obj.name + '》教学设计（AI 初稿）', html);
   },
   run: function () {
     var id = document.getElementById('prepLesson').value;
@@ -117,14 +167,24 @@ App.pages.prep = {
 
 /* ---------------- 习题生成 ---------------- */
 App.pages.exam = {
-  state: { lesson: 'all', level: 'all', type: 'all' },
+  state: { lesson: 'all', level: 'all', type: 'all', aiTopic: '' },
   render: function (main) {
     var s = this.state;
     var lOpts = '<option value="all">全部课目</option>' + KB.lessons.map(function (l) {
       return '<option value="' + l.id + '"' + (s.lesson === l.id ? ' selected' : '') + '>' + l.name + '</option>';
     }).join('');
     main.innerHTML =
-      App.pageHead('习题生成 · 三维组卷', '知识库：分层题库 45 题，每题含判分点、解析与错因标签，杜绝"裸题"', '教师端') +
+      App.pageHead('习题生成 · 三维组卷', '内置知识库 + AI 增强：分层题库 45 题，每题含判分点、解析与错因标签，杜绝"裸题"', '教师端') +
+      App.AI.settingsCard() +
+      App.card('AI 自由组卷（任意课目/知识点）',
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
+        '<div style="flex:1;min-width:260px"><label class="fld">输入任意课目或知识点</label><input id="exAiTopic" placeholder="如：商鞅变法 / 洋务运动 / 明清君主专制强化 / 新文化运动…" style="width:100%"></div>' +
+        '<button class="btn btn-green" onclick="App.pages.exam.aiRun()">🤖 AI 生成习题</button>' +
+        '</div>' +
+        (App.AI.hasKey()
+          ? '<div class="muted" style="margin-top:10px">已接入 DeepSeek：将按基础 / 提升 / 拓展三个层级生成 6 道带答案与解析的习题（约 30 秒）。</div>'
+          : '<div class="muted" style="margin-top:10px"><b>未配置 API Key：</b>请先在顶部「AI 增强」中填入 DeepSeek Key，或使用下方内置题库筛选组卷。</div>')
+      ) +
       App.card('组卷条件',
         '<div class="grid grid-3">' +
         '<div><label class="fld">课目</label><select id="exLesson" style="width:100%" onchange="App.pages.exam.re()">' + lOpts + '</select></div>' +
@@ -140,7 +200,7 @@ App.pages.exam = {
     var lesson = document.getElementById('exLesson').value;
     var level = document.getElementById('exLevel').value;
     var type = document.getElementById('exType').value;
-    this.state = { lesson: lesson, level: level, type: type };
+    this.state = { lesson: lesson, level: level, type: type, aiTopic: this.state.aiTopic };
     var list = KB.questions.filter(function (q) {
       return (lesson === 'all' || q.lesson === lesson) && (level === 'all' || q.level === level) && (type === 'all' || q.type === type);
     });
@@ -171,6 +231,38 @@ App.pages.exam = {
         '<button class="btn btn-outline" onclick="App.go(\'grading\')">去批改配套作业 →</button></div>';
     }
     document.getElementById('exResult').innerHTML = html;
+  },
+  aiRun: function () {
+    var topic = (document.getElementById('exAiTopic').value || '').trim();
+    if (!topic) { App.AI.toastErr('请先输入课目或知识点。'); return; }
+    if (!App.AI.hasKey()) {
+      App.AI.toastErr('尚未配置 DeepSeek API Key，请先在「AI 增强」中填入 Key，或使用下方内置题库。');
+      return;
+    }
+    var res = document.getElementById('exResult');
+    res.innerHTML = '<div class="card"><p class="muted">⏳ AI 正在为「' + topic + '」生成分层习题（基础2 / 提升2 / 拓展2），约 20–40 秒…</p></div>';
+    App.AI.genExam(topic, function (arr) {
+      App.pages.exam.state.aiTopic = topic;
+      res.innerHTML = App.AI.renderExam(arr, topic) +
+        '<div class="card no-print" style="text-align:center"><button class="btn btn-green" onclick="App.pages.exam.aiExport(arr)">导出本套习题（Word）</button></div>';
+      document.getElementById('exAiTopic').value = '';
+    }, function (e) {
+      res.innerHTML = '<div class="card"><p class="muted">AI 生成失败：' + e.message + '，请重试。</p></div>';
+    });
+  },
+  aiExport: function (arr) {
+    var topic = this.state.aiTopic || 'AI 习题';
+    var html = '<p>AI 生成分层习题（基础2 / 提升2 / 拓展2）</p>';
+    arr.forEach(function (q, i) {
+      var lv = q.level === 'mid' ? '提升' : (q.level === 'adv' ? '拓展' : '基础');
+      html += '<p><b>' + (i + 1) + '.（' + lv + '·' + (q.type || '选择') + '）</b>' + q.stem + '</p>';
+      if (q.opts) html += '<p>' + q.opts.map(function (o, j) { return String.fromCharCode(65 + j) + '. ' + o; }).join('　') + '</p>';
+    });
+    html += '<h2>参考答案与判分点（教师用）</h2>';
+    arr.forEach(function (q, i) {
+      html += '<p><b>' + (i + 1) + '.</b> 答案：' + q.ans + '｜判分点：' + (q.points || []).join('；') + '｜错因标签：' + (q.wrong || '无') + '</p>';
+    });
+    App.exportWord('AI-分层习题', '初中历史 AI 分层习题卷', html);
   },
   exportDoc: function () {
     var s = this.state;

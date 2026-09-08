@@ -6,17 +6,13 @@ App.navGroups = [
   { label: '首页', route: 'home' },
   { group: '教师端', items: [
     { label: '智能备课', route: 'prep' },
-    { label: '习题生成', route: 'exam' },
-    { label: '作业批改', route: 'grading' },
-    { label: '学情分析', route: 'analytics' }
+    { label: '习题生成', route: 'exam' }
   ]},
   { group: '学生端', items: [
     { label: '启发答疑', route: 'tutor' },
-    { label: '错题本', route: 'mistakes' },
     { label: '复习规划', route: 'plan' }
   ]},
   { group: '插件', items: [
-    { label: '历史时间轴', route: 'timeline' },
     { label: '家校沟通', route: 'family' }
   ]}
 ];

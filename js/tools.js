@@ -1,37 +1,4 @@
-/* ============ 插件：时间轴 + 家校沟通 ============ */
-
-/* ---------------- 历史时间轴插件 ---------------- */
-App.pages.timeline = {
-  state: { mode: 'ancient', sel: -1 },
-  render: function (main) {
-    var s = this.state;
-    var data = KB.timeline[s.mode];
-    var nodes = data.map(function (d, i) {
-      return '<div class="tl-node ' + (s.sel === i ? 'sel' : '') + '" onclick="App.pages.timeline.sel(' + i + ')">' +
-        '<div class="nm">' + d.name + '</div><div class="yr">' + d.year + '</div><div class="dot"></div></div>';
-    }).join('');
-    var detail = '';
-    if (s.sel >= 0) {
-      var d = data[s.sel];
-      detail = App.card('【' + d.name + '】（' + d.year + '）',
-        '<p class="kv"><b>统编教材定位：</b><span class="tag tag-ochre">' + d.book + '</span></p>' +
-        '<div class="section-title" style="font-size:16px">关联大事</div>' +
-        '<ul style="padding-left:22px">' + d.events.map(function (e) { return '<li style="margin:4px 0">' + e + '</li>'; }).join('') + '</ul>' +
-        '<p class="muted">✓ 已同步至时间轴记忆卡：按朝代顺序每日滚动复习 5 张。</p>');
-    } else {
-      detail = '<div class="card"><p class="muted">点击任一朝代 / 事件，查看大事与教材定位。时间轴是治疗"时序错乱"的第一味药。</p></div>';
-    }
-    main.innerHTML =
-      App.pageHead('历史时间轴插件', '朝代轴 + 近代大事轴双模式，直击"时序错乱"类错因（占班级失分归因的 15%）', '插件') +
-      App.card('模式切换',
-        '<button class="btn ' + (s.mode === 'ancient' ? '' : 'btn-outline') + ' btn-sm" onclick="App.pages.timeline.switch(\'ancient\')">古代朝代轴（七年级）</button> ' +
-        '<button class="btn ' + (s.mode === 'modern' ? '' : 'btn-outline') + ' btn-sm" onclick="App.pages.timeline.switch(\'modern\')">中国近代大事轴（八年级）</button>') +
-      '<div class="card"><div class="tl-track"><div class="tl-line"></div><div class="tl-items">' + nodes + '</div></div></div>' +
-      '<div id="tlDetail">' + detail + '</div>';
-  },
-  switch: function (mode) { this.state = { mode: mode, sel: -1 }; this.render(document.getElementById('app')); },
-  sel: function (i) { this.state.sel = i; this.render(document.getElementById('app')); }
-};
+/* ============ 插件：家校沟通（内置模板 + AI 增强） ============ */
 
 /* ---------------- 家校沟通插件 ---------------- */
 App.pages.family = {
@@ -42,8 +9,19 @@ App.pages.family = {
         '<h4>' + t.name + '</h4><p class="muted">' + t.desc + '</p></div>';
     }).join('');
     main.innerHTML =
-      App.pageHead('家校沟通插件', '把学情数据转写成家长听得懂的话：三档模板自动生成，一键复制到班级群', '插件') +
-      '<div class="grid grid-3">' + cards + '</div>' +
+      App.pageHead('家校沟通插件', '内置三大场景模板 + AI 任意文案生成：一键生成、自动脱敏、复制到班级群', '插件') +
+      App.AI.settingsCard() +
+      App.card('AI 自由文案生成（任意需求）',
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">' +
+        '<div style="flex:1;min-width:260px"><label class="fld">输入你想发的通知 / 文案内容</label>' +
+        '<input id="famAiReq" placeholder="如：下周举行历史知识竞赛，通知家长报名和注意事项 / 期末考试临近，提醒家长督促复习 / 运动会需要家长志愿者…" style="width:100%"></div>' +
+        '<button class="btn btn-green" onclick="App.pages.family.aiGen()">🤖 AI 生成文案</button>' +
+        '</div>' +
+        (App.AI.hasKey()
+          ? '<div class="muted" style="margin-top:10px">已接入 DeepSeek：将按你的需求生成规范、得体、脱敏的家长文案（约 10–20 秒）。</div>'
+          : '<div class="muted" style="margin-top:10px"><b>未配置 API Key：</b>请在顶部「AI 增强」中填入 DeepSeek Key，或使用下方内置三大场景模板。</div>')
+      ) +
+      '<div class="grid grid-3" id="famTplCards">' + cards + '</div>' +
       '<div class="card" id="familyEditor">' +
       '<h3>生成文案</h3>' +
       '<div class="grid grid-3">' +
@@ -51,12 +29,12 @@ App.pages.family = {
       '<div><label class="fld">落款教师</label><input type="text" id="fTeacher" value="李老师" style="width:100%"></div>' +
       '<div><label class="fld">日期</label><input type="text" id="fDate" value="2026 年 9 月" style="width:100%"></div>' +
       '</div>' +
-      '<div style="margin:14px 0 8px"><label class="fld">模板</label><select id="fTpl" style="width:100%">' +
+      '<div style="margin:14px 0 8px"><label class="fld">内置模板</label><select id="fTpl" style="width:100%">' +
       tpls.map(function (t, i) { return '<option value="' + i + '">' + t.name + '</option>'; }).join('') + '</select></div>' +
       '<button class="btn" onclick="App.pages.family.gen()">生成文案</button> ' +
       '<button class="btn btn-outline" onclick="App.pages.family.copy()">复制全文</button>' +
-      '<p class="muted" style="margin-top:10px">提示：文案中的学情表述来自"学情分析"页的汇总数据（个体明细已脱敏），符合未成年人隐私保护要求。</p>' +
-      '<textarea id="fOut" style="width:100%;min-height:280px;margin-top:10px;font-size:13.5px" placeholder="点击"生成文案"…"></textarea>' +
+      '<p class="muted" style="margin-top:10px">提示：模板文案中的学情表述已做个体脱敏处理；AI 生成文案不出现学生姓名，符合未成年人隐私保护要求。</p>' +
+      '<textarea id="fOut" style="width:100%;min-height:300px;margin-top:10px;font-size:13.5px" placeholder="点击「生成文案」…"></textarea>' +
       '</div>';
     this.gen();
   },
@@ -69,9 +47,27 @@ App.pages.family = {
     var text = KB.familyTemplates[i].build(this.vals());
     document.getElementById('fOut').value = text;
   },
+  aiGen: function () {
+    var req = (document.getElementById('famAiReq').value || '').trim();
+    if (!req) { App.AI.toastErr('请先输入想发的通知内容。'); return; }
+    if (!App.AI.hasKey()) {
+      App.AI.toastErr('尚未配置 DeepSeek API Key，请先在「AI 增强」中填入 Key，或使用下方内置模板。');
+      return;
+    }
+    var out = document.getElementById('fOut');
+    out.value = '⏳ AI 正在生成文案，约 10–20 秒…';
+    App.AI.genFamily(req, this.vals(), function (text) {
+      out.value = text;
+      App.AI.toastOk('AI 文案已生成，可点击「复制全文」发送到班级群。');
+      document.getElementById('famAiReq').value = '';
+    }, function (e) {
+      out.value = '';
+      App.AI.toastErr('AI 生成失败：' + e.message + '，请重试。');
+    });
+  },
   copy: function () {
     var out = document.getElementById('fOut');
-    if (!out.value) { out.placeholder = '请先生成文案'; return; }
+    if (!out.value || out.value.indexOf('⏳') === 0) { App.AI.toastErr('请先生成文案。'); return; }
     var btn = event && event.target;
     App.copyText(out.value, btn);
   }

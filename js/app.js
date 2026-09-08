@@ -4,15 +4,9 @@ App.pages = {};
 
 App.navGroups = [
   { label: '首页', route: 'home' },
-  { group: '教师端', items: [
+  { group: '教学辅助', items: [
     { label: '智能备课', route: 'prep' },
-    { label: '习题生成', route: 'exam' }
-  ]},
-  { group: '学生端', items: [
-    { label: '启发答疑', route: 'tutor' },
-    { label: '复习规划', route: 'plan' }
-  ]},
-  { group: '插件', items: [
+    { label: '习题生成', route: 'exam' },
     { label: '家校沟通', route: 'family' }
   ]}
 ];
